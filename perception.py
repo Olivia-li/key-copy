@@ -58,26 +58,26 @@ def find_contours(image):
     cnts = cv2.findContours(edged, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
-    for c in cnts:
-        peri = cv2.arcLength(c, True)
-        approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+    for contour in cnts:
+        perimeter = cv2.arcLength(contour, True)
+        approx = cv2.approxPolyDP(contour, 0.02 * perimeter, True)
 
     # Find contour with 4 points to get rectangle
         if len(approx) == 4:
-            screenCnt = approx
+            contour_points = approx
             break
 
-    return screenCnt
+    return contour_points
 
 
-def apply_transform(image, screenCnt):
+def apply_transform(image, contour_points):
     copy = image.copy()
-    warped = perception_transform(copy, screenCnt.reshape(4, 2) * image.shape[0] / 500.0)
+    warped = perception_transform(copy, contour_points.reshape(4, 2) * image.shape[0] / 500.0)
     warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
-    thresholded_image = filters.threshold_local(warped, 11, offset=10, method="gaussian")
-    thresholded = (warped > thresholded_image).astype("uint8") * 255
+    threshold = filters.threshold_local(warped, 27, offset=10, method="gaussian")
+    thresholded_image = (warped > threshold).astype("uint8") * 255
 
     cv2.imshow("Scanned", imutils.resize(warped, height=650))
-    cv2.imshow("Thresholded", imutils.resize(thresholded, height=650))
+    cv2.imshow("Thresholded", imutils.resize(thresholded_image, height=650))
     cv2.waitKey(0)
