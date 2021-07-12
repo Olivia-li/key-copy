@@ -15,6 +15,14 @@ ax.xaxis.grid(True, which='major')
 ax.yaxis.grid(True, which='major')
 ax.set_aspect("equal")
 
+for tick in ax.xaxis.get_major_ticks():
+    tick.tick1line.set_visible(False)
+    tick.label1.set_visible(False)
+
+for tick in ax.yaxis.get_major_ticks():
+    tick.tick1line.set_visible(False)
+    tick.label1.set_visible(False)
+
 # Add black marker on top-left
 plt.plot(0.5, 9.5, 'ks', markersize=55)
 
