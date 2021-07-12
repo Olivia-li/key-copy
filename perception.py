@@ -14,11 +14,29 @@ orig = image.copy()
 image = imutils.resize(image, height=500)
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+thresh_value, gray = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 gray = cv2.GaussianBlur(gray, (5, 5), 0)
 edged = cv2.Canny(gray, 75, 200)
 
-cv2.imshow("Original", image)
-cv2.imshow("Canny Edged", edged)
+# cv2.imshow("Original", image)
+# cv2.imshow("Canny Edged", edged)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
+cnts = cv2.findContours(edged, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+cnts = imutils.grab_contours(cnts)
+cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
+
+for c in cnts:
+    peri = cv2.arcLength(c, True)
+    approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+    # Find contour with 4 points to get rectangle
+    if len(approx) == 4:
+        screenCnt = approx
+    break
+
+cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 2)
+cv2.imshow("Countoured", image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
