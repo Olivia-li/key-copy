@@ -6,7 +6,7 @@ y = []
 
 fig, ax = plt.subplots(figsize=(10, 10), dpi=100)
 plt.plot(x, y)
-plt.grid([True, 'major', 'both'], linewidth=1.5, color="black")
+plt.grid([True, 'major', 'both'], linewidth=0.5)
 plt.xlim([0, 10])
 plt.ylim([0, 10])
 ax.set_xticks(range(1, 10), minor=False)

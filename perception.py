@@ -3,6 +3,8 @@ import cv2
 from skimage import filters
 import imutils
 
+FILE_NAME = "key_flat.png"
+
 
 def order_rectangle_points(vertices):
     # order is [top-left, top-right, bottom-right, bottom-left]
@@ -51,7 +53,7 @@ def find_contours(image):
     image = imutils.resize(image, height=500)
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    thresh_value, gray = cv2.threshold(gray, 130, 200, cv2.THRESH_BINARY)
+    thresh_value, gray = cv2.threshold(gray, 165, 255, cv2.THRESH_BINARY)
     gray = cv2.GaussianBlur(gray, (5, 5), 0)
     edged = cv2.Canny(gray, 75, 200)
 
@@ -75,9 +77,14 @@ def apply_transform(image, contour_points):
     warped = perception_transform(copy, contour_points.reshape(4, 2) * image.shape[0] / 500.0)
     warped = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
 
-    threshold = filters.threshold_local(warped, 27, offset=10, method="gaussian")
+    # threshold = filters.threshold_local(warped, 27, offset=10, method="gaussian")
+
+    threshold = filters.threshold_minimum(image)
     thresholded_image = (warped > threshold).astype("uint8") * 255
 
-    cv2.imshow("Scanned", imutils.resize(warped, height=650))
-    cv2.imshow("Thresholded", imutils.resize(thresholded_image, height=650))
-    cv2.waitKey(0)
+    # cv2.imshow("Scanned", imutils.resize(warped, height=650))
+    # cv2.imshow("Thresholded", imutils.resize(thresholded_image, height=650))
+    cv2.imwrite(FILE_NAME, thresholded_image)
+    # cv2.waitKey(0)
+
+    return FILE_NAME
