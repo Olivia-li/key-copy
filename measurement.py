@@ -12,6 +12,7 @@ def grab_key(file_path):
     flat_image = cv2.imread(file_path)
     gray = cv2.cvtColor(flat_image, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (7, 7), 0)
+    edged = cv2.Canny(gray, 75, 200)
 
     # Close gap between canny edge detection
     edged = cv2.dilate(gray, None, iterations=1)
@@ -27,13 +28,18 @@ def grab_key(file_path):
 
     for c in cnts:
         if cv2.contourArea(c) > 15000 and cv2.contourArea(c) > 100000:
-            break
+            raise "Could not find key bounding box"
         orig = flat_image.copy()
         box = cv2.minAreaRect(c)
         box = cv2.cv.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
         box = np.array(box, dtype="int")
         box = perspective.order_points(box)
+
+        # box contour around key
         cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 2)
+
+        # contour of the key
+        cv2.drawContours(orig, cnts, -1, (0, 255, 0), 3)
         for (x, y) in box:
             cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
 
